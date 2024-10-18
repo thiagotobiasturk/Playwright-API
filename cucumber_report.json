@@ -1,0 +1,71 @@
+[
+  {
+    "description": "",
+    "elements": [
+      {
+        "description": "",
+        "id": "api-testing-with-playwright;get-user-data-from-api",
+        "keyword": "Scenario",
+        "line": 3,
+        "name": "Get user data from API",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 44226899
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 4,
+            "name": "I send a GET request to \"/users/1\"",
+            "match": {
+              "location": "features\\tests\\api.steps.js:11"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 140013199
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 5,
+            "name": "the response status code should be 200",
+            "match": {
+              "location": "features\\tests\\api.steps.js:15"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1766900
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 6,
+            "name": "the response body should contain \"username\"",
+            "match": {
+              "location": "features\\tests\\api.steps.js:19"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 3922399
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      }
+    ],
+    "id": "api-testing-with-playwright",
+    "line": 1,
+    "keyword": "Feature",
+    "name": "API Testing with Playwright",
+    "tags": [],
+    "uri": "features\\api_test.feature"
+  }
+]
