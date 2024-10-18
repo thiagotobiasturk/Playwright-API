@@ -13,3 +13,7 @@ cd Playwright-Apis
 ```bash
 npm install
 ```
+### 3. Run Tests
+```bash
+npm test
+```
