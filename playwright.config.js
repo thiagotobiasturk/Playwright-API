@@ -5,5 +5,6 @@ module.exports = defineConfig({
   reporter: [['list']],
   use: {
     baseURL: 'https://jsonplaceholder.typicode.com',
+    headless: true
   },
 });
