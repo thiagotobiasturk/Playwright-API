@@ -1,13 +1,13 @@
-# Playwright-Apis
+# Playwright-API
 
 ### 1. Clone the Repository
 
 First, clone the repository to your local machine:
 
 ```bash
-git clone https://github.com/thiagotobiasturk/Playwright-Apis.git
+git clone https://github.com/thiagotobiasturk/Playwright-API.git
 
-cd Playwright-Apis
+cd Playwright-API
 ```
 ### 2. Install Dependencies
 ```bash
