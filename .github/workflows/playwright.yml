@@ -29,13 +29,4 @@ jobs:
         run: |
           docker run --rm playwright-test
 
-      - name: Run tests in Docker
-        run: |
-              docker run --rm -v ${{ github.workspace }}/reports:/app/reports playwright-test
-
-      - name: Upload Test Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-report
-          path: reports 
+      
