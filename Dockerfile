@@ -10,4 +10,6 @@ RUN npx playwright install chromium
 
 COPY . .
 
+RUN mkdir -p /app/reports
+
 CMD ["npm", "test"]

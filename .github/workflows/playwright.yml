@@ -1,13 +1,14 @@
 name: CI
 
 on:
-  push:
+  workflow_dispatch:
     branches:
       - develop
       - master
   pull_request:
     branches:
       - develop
+      - master
 
 jobs:
   build-and-test:
@@ -27,3 +28,14 @@ jobs:
       - name: Run tests in Docker
         run: |
           docker run --rm playwright-test
+
+      - name: Run tests in Docker
+        run: |
+              docker run --rm -v ${{ github.workspace }}/reports:/app/reports playwright-test
+
+      - name: Upload Test Report
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-report
+          path: reports 
