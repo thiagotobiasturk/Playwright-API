@@ -1,10 +1,10 @@
-name: Check Open Pull Requests
+name: Check Open and Approved Pull Requests
 
 on:
   push:
     branches:
-      - master
       - develop
+      - master
   workflow_dispatch:
 
 jobs:
@@ -15,7 +15,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Check for open PRs
+      - name: Check for open PRs and approvals
         run: |
           PRS=$(curl -s -H "Authorization: token ${{ secrets.TOKEN_GH }}" \
                         "https://api.github.com/repos/${{ github.repository }}/pulls?state=open")
@@ -24,8 +24,23 @@ jobs:
 
           if [ "$PR_COUNT" -gt 0 ]; then
             echo "Hay PRs abiertos:"
-            # Extraemos y mostramos el número de cada PR
-            echo "$PRS" | jq -r '.[].number'
+            # Iteramos sobre cada PR y verificamos si está aprobado
+            echo "$PRS" | jq -r '.[].number' | while read pr_number; do
+              echo "Revisando PR #$pr_number..."
+              
+              # Obtenemos los reviews de cada PR
+              REVIEWS=$(curl -s -H "Authorization: token ${{ secrets.TOKEN_GH }}" \
+                              "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number/reviews")
+
+              # Verificamos si hay algún review aprobado
+              APPROVED=$(echo "$REVIEWS" | jq '[.[] | select(.state == "APPROVED")] | length')
+
+              if [ "$APPROVED" -gt 0 ]; then
+                echo "PR #$pr_number está aprobado."
+              else
+                echo "PR #$pr_number no está aprobado."
+              fi
+            done
           else
             echo "No hay PRs abiertos."
           fi
