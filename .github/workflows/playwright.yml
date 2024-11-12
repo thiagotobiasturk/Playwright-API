@@ -1,121 +1,44 @@
-name: Check Open and Approved Pull Requests
+name: CI/CD
 
 on:
-  push:
+  pull_request_review:
     branches:
       - develop
       - master
-  workflow_dispatch:
+    types:
+      - submitted  # Este evento se activa cuando se envía una revisión
+
+  pull_request:
+    branches:
+      - develop
+      - master
+    types:
+      - opened
+      - edited
+      - synchronize
+      - ready_for_review
+      - closed
 
 jobs:
-  check-prs:
+  build-and-test:
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: read
+      pull-requests: read
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Check for open PRs and approvals
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build Docker image
         run: |
-          PRS=$(curl -s -H "Authorization: token ${{ secrets.TOKEN_GH }}" \
-                        "https://api.github.com/repos/${{ github.repository }}/pulls?state=open")
-          
-          PR_COUNT=$(echo "$PRS" | jq length)
+          docker build -t playwright-test .
 
-          if [ "$PR_COUNT" -gt 0 ]; then
-            echo "Hay PRs abiertos:"
-            # Iteramos sobre cada PR y verificamos si está aprobado
-            echo "$PRS" | jq -r '.[].number' | while read pr_number; do
-              echo "Revisando PR #$pr_number..."
-              
-              # Obtenemos los reviews de cada PR
-              REVIEWS=$(curl -s -H "Authorization: token ${{ secrets.TOKEN_GH }}" \
-                              "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number/reviews")
-
-              # Verificamos si hay algún review aprobado
-              APPROVED=$(echo "$REVIEWS" | jq '[.[] | select(.state == "APPROVED")] | length')
-
-              if [ "$APPROVED" -gt 0 ]; then
-                echo "PR #$pr_number está aprobado."
-              else
-                echo "PR #$pr_number no está aprobado."
-              fi
-            done
-          else
-            echo "No hay PRs abiertos."
-          fi
-        env:
-          TOKEN_GH: ${{ secrets.TOKEN_GH }}
-
-# name: CI/CD
-
-# on:
-#   push:
-#     branches:
-#       - develop
-#       - master
-#   pull_request:
-#     branches:
-#       - develop
-#       - master
-#     types:
-#       - labeled
-#       - review_requested
-#       - review_request_removed
-#       - opened
-#       - edited
-#       - synchronize
-#       - ready_for_review
-#       - closed
-
-# jobs:
-#   build-and-test:
-#     runs-on: ubuntu-latest
-#     permissions:
-#       contents: read
-#       pull-requests: read
-
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v2
-
-#       - name: Set up Docker Buildx
-#         uses: docker/setup-buildx-action@v1
-
-#       - name: Build Docker image
-#         run: |
-#           docker build -t playwright-test .
-
-#       - name: Debug PR number
-#         run: echo "Pull Request number:${{ github.event.pull_request.number }}"
-
-#       - name: Check PR approval status
-#         id: pr_approval_check
-#         run: |
-#           echo "Checking PR approval status..."
-          
-#           # Usar el token personal de acceso (PAT) almacenado como secreto
-#           approval_status=$(curl -v -s \
-#             -H "Authorization: Bearer ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
-#             "https://github.com/thiagotobiasturk/Playwright-API/pull/5")
-          
-#           # Mostrar el resultado para depuración
-#           echo "Approval status: $approval_status"
-          
-#           # Si encontramos una revisión con estado "APPROVED", asignamos "approved=true"
-#           if echo "$approval_status" | jq '.[] | select(.state == "APPROVED")' > /dev/null; then
-#             echo "PR is approved"
-#             echo "approved=true" >> $GITHUB_ENV  # Guardar en variable de entorno
-#           else
-#             echo "PR is not approved"
-#             echo "approved=false" >> $GITHUB_ENV  # Guardar en variable de entorno
-#           fi
-
-#       - name: Display approved status
-#         run: echo "The approval status is:$approved"
-
-#       - name: Run tests in Docker
-#         if: env.approved == 'true'
-#         run: |
-#           echo "Running tests in Docker because PR is approved."
-#           docker run --rm playwright-test
+      - name: Run tests in Docker
+        if: ${{ github.event.review.state == 'approved' }}  # Solo se ejecuta si la revisión es aprobada
+        run: |
+          echo "Running tests in Docker because PR is approved."
+          docker run --rm playwright-test
