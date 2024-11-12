@@ -41,7 +41,7 @@ jobs:
 
           # Verificar si el PR tiene al menos una revisión aprobada usando la API de GitHub
           approval_status=$(curl -s \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Authorization: Bearer $TOKEN_GH" \
             "https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/${{ github.event.pull_request.number }}/reviews")
 
           # Mostrar el resultado para depuración
