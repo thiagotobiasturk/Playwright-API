@@ -63,7 +63,7 @@ jobs:
           fi
 
       - name: Display approved status
-        run: echo "The approval status is: $approved"
+        run: echo "The approval status is:$approved"
 
       - name: Run tests in Docker
         if: env.approved == 'true'
