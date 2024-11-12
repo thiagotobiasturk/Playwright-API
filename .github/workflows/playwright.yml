@@ -60,7 +60,7 @@ jobs:
           fi
 
       - name: Display approved status
-        run: echo "The approval status is:$approved"  # Acceder a la variable de entorno directamente
+        run: echo "The approval status is: $approved"  # Acceder a la variable de entorno directamente
 
       - name: Run tests in Docker
         if: env.approved == 'true'  # Condición para ejecutar las pruebas si la variable de entorno 'approved' es true
