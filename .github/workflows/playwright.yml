@@ -22,6 +22,9 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read  # Permitir lectura de las revisiones del PR
 
     steps:
       - name: Checkout code
@@ -38,15 +41,15 @@ jobs:
         id: pr_approval_check
         run: |
           echo "Checking PR approval status..."
-
-          # Verificar si el PR tiene al menos una revisión aprobada usando la API de GitHub
+          
+          # Usar el token personal de acceso (PAT) almacenado como secreto
           approval_status=$(curl -s \
-            -H "Authorization: Bearer $TOKEN_GH" \
+            -H "Authorization: Bearer ${{ secrets.TOKEN_GH }}" \
             "https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/${{ github.event.pull_request.number }}/reviews")
-
+          
           # Mostrar el resultado para depuración
           echo "Approval status: $approval_status"
-
+          
           # Si encontramos una revisión con estado "APPROVED", asignamos "approved=true"
           if echo "$approval_status" | jq '.[] | select(.state == "APPROVED")' > /dev/null; then
             echo "PR is approved"
