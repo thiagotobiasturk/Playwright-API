@@ -6,18 +6,7 @@ on:
       - develop
       - master
     types:
-      - submitted  # Este evento se activa cuando se envía una revisión
-
-  pull_request:
-    branches:
-      - develop
-      - master
-    types:
-      - opened
-      - edited
-      - synchronize
-      - ready_for_review
-      - closed
+      - submitted  
 
 jobs:
   build-and-test:
@@ -38,7 +27,7 @@ jobs:
           docker build -t playwright-test .
 
       - name: Run tests in Docker
-        if: ${{ github.event.review.state == 'approved' }}  # Solo se ejecuta si la revisión es aprobada
+        if: ${{ github.event.review.state == 'approved' }}  
         run: |
           echo "Running tests in Docker because PR is approved."
           docker run --rm playwright-test
