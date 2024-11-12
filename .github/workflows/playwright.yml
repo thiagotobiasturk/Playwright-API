@@ -3,8 +3,8 @@ name: Check Open Pull Requests
 on:
   push:
     branches:
-      - develop
       - master
+      - develop
   workflow_dispatch:
 
 jobs:
@@ -17,11 +17,15 @@ jobs:
 
       - name: Check for open PRs
         run: |
-          PR_COUNT=$(curl -s -H "Authorization: token ${{ secrets.TOKEN_GH }}" \
-                        "https://api.github.com/repos/${{ github.repository }}/pulls?state=open" | jq length)
+          PRS=$(curl -s -H "Authorization: token ${{ secrets.TOKEN_GH }}" \
+                        "https://api.github.com/repos/${{ github.repository }}/pulls?state=open")
+          
+          PR_COUNT=$(echo "$PRS" | jq length)
 
           if [ "$PR_COUNT" -gt 0 ]; then
-            echo "Hay PRs abiertos: $PR_COUNT"
+            echo "Hay PRs abiertos:"
+            # Extraemos y mostramos el número de cada PR
+            echo "$PRS" | jq -r '.[].number'
           else
             echo "No hay PRs abiertos."
           fi
