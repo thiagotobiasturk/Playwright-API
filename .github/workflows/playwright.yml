@@ -24,12 +24,11 @@ jobs:
         uses: docker/setup-buildx-action@v1
 
       - name: Build Docker image
-        if: github.event.review.state == 'aproved'
         run: |
           docker build -t playwright-test .
 
       - name: Run tests in Docker
-        
+        if: github.event.review.state == 'aproved'
         run: |
           docker run --rm playwright-test
 
