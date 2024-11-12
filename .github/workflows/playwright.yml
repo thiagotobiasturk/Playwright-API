@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: read  # Permitir lectura de las revisiones del PR
+      pull-requests: read
 
     steps:
       - name: Checkout code
@@ -37,14 +37,17 @@ jobs:
         run: |
           docker build -t playwright-test .
 
+      - name: Debug PR number
+        run: echo "Pull Request number:${{ github.event.pull_request.number }}"
+
       - name: Check PR approval status
         id: pr_approval_check
         run: |
           echo "Checking PR approval status..."
           
           # Usar el token personal de acceso (PAT) almacenado como secreto
-          approval_status=$(curl -s \
-            -H "Authorization: Bearer ${{ secrets.TOKEN_GH }}" \
+          approval_status=$(curl -v -s \
+            -H "Authorization: Bearer ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
             "https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/${{ github.event.pull_request.number }}/reviews")
           
           # Mostrar el resultado para depuración
@@ -60,10 +63,10 @@ jobs:
           fi
 
       - name: Display approved status
-        run: echo "The approval status is:$approved"  # Acceder a la variable de entorno directamente
+        run: echo "The approval status is: $approved"
 
       - name: Run tests in Docker
-        if: env.approved == 'true'  # Condición para ejecutar las pruebas si la variable de entorno 'approved' es true
+        if: env.approved == 'true'
         run: |
           echo "Running tests in Docker because PR is approved."
           docker run --rm playwright-test
