@@ -37,11 +37,16 @@ jobs:
       - name: Check PR approval status
         id: pr_approval_check
         run: |
+          echo "Checking PR approval status..."
+
           # Verificar si el PR tiene al menos una revisión aprobada usando la API de GitHub
           approval_status=$(curl -s \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             "https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/${{ github.event.pull_request.number }}/reviews")
-          
+
+          # Mostrar el resultado para depuración
+          echo "Approval status: $approval_status"
+
           # Si encontramos una revisión con estado "APPROVED", asignamos "approved=true" en el entorno
           if echo "$approval_status" | jq '.[] | select(.state == "APPROVED")' > /dev/null; then
             echo "PR is approved"
@@ -51,7 +56,11 @@ jobs:
             echo "approved=false" >> $GITHUB_ENV
           fi
 
+      - name: Display approved status
+        run: echo "The approval status is: ${{ env.approved }}"
+
       - name: Run tests in Docker
         if: env.approved == 'true'  # Este paso solo se ejecuta si el PR está aprobado
         run: |
+          echo "Running tests in Docker because PR is approved."
           docker run --rm playwright-test
