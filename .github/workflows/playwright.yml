@@ -1,7 +1,8 @@
 name: CI/CD
 
 on:
-  workflow_dispatch:
+  # workflow_dispatch:
+  push:
     branches:
       - develop
       - master
@@ -9,6 +10,7 @@ on:
     branches:
       - develop
       - master
+    types: review
 
 jobs:
   build-and-test:
@@ -26,6 +28,7 @@ jobs:
           docker build -t playwright-test .
 
       - name: Run tests in Docker
+        if: github.event.review.state == 'aproved'
         run: |
           docker run --rm playwright-test
 
