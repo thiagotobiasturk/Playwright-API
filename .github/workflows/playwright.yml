@@ -10,7 +10,15 @@ on:
     branches:
       - develop
       - master
-    types: review
+    types:
+      - labeled
+      - review_requested
+      - review_request_removed
+      - opened
+      - edited
+      - synchronize
+      - ready_for_review
+      - closed
 
 jobs:
   build-and-test:
@@ -28,7 +36,7 @@ jobs:
           docker build -t playwright-test .
 
       - name: Run tests in Docker
-        if: github.event.review.state == 'aproved'
+        if: env.approved == 'true'
         run: |
           docker run --rm playwright-test
 
