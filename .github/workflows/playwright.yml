@@ -48,7 +48,7 @@ jobs:
           # Usar el token personal de acceso (PAT) almacenado como secreto
           approval_status=$(curl -v -s \
             -H "Authorization: Bearer ${{ secrets.PERSONAL_ACCESS_TOKEN }}" \
-            "https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/${{ github.event.pull_request.number }}/reviews")
+            "https://github.com/thiagotobiasturk/Playwright-API/pull/5")
           
           # Mostrar el resultado para depuración
           echo "Approval status: $approval_status"
