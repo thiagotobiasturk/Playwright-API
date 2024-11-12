@@ -1,7 +1,6 @@
 name: CI/CD
 
 on:
-  # workflow_dispatch:
   push:
     branches:
       - develop
@@ -35,9 +34,24 @@ jobs:
         run: |
           docker build -t playwright-test .
 
+      - name: Check PR approval status
+        id: pr_approval_check
+        run: |
+          # Verificar si el PR tiene al menos una revisión aprobada usando la API de GitHub
+          approval_status=$(curl -s \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/${{ github.event.pull_request.number }}/reviews")
+          
+          # Si encontramos una revisión con estado "APPROVED", asignamos "approved=true" en el entorno
+          if echo "$approval_status" | jq '.[] | select(.state == "APPROVED")' > /dev/null; then
+            echo "PR is approved"
+            echo "approved=true" >> $GITHUB_ENV
+          else
+            echo "PR is not approved"
+            echo "approved=false" >> $GITHUB_ENV
+          fi
+
       - name: Run tests in Docker
-        if: env.approved == 'true'
+        if: env.approved == 'true'  # Este paso solo se ejecuta si el PR está aprobado
         run: |
           docker run --rm playwright-test
-
-      
