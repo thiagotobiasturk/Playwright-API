@@ -28,7 +28,7 @@ jobs:
           docker build -t playwright-test .
 
       - name: Run tests in Docker
-        if: ${{ github.event.review.state == 'approved' }}  
+        if: github.event.review.state == 'approved'  
         run: |
           echo "Running tests in Docker because PR is approved."
           docker run --rm playwright-test
