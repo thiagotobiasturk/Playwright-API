@@ -24,9 +24,6 @@ jobs:
 
 
       - name: Build Docker image
-
-      - name: Build Docker image
-
         run: |
           docker build -t playwright-test .
 
